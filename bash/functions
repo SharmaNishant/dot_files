@@ -237,3 +237,13 @@ record_mp4 ()
         --stop-shortcut Mod4+s
     convert_to_mp4 "${temp_ogv}" "$1"
 }
+
+
+################################################################################
+#                          YOUTUBE DL UTILITIES                                #
+################################################################################
+
+download_channel_mp3() {
+    youtube-dl -f "bestaudio/best" -ciw -o "%(title)s.%(ext)s" -v --extract-audio --audio-quality 0 --audio-format mp3 "${1}"
+}
+
