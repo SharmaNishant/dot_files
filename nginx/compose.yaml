@@ -1,0 +1,11 @@
+services :
+  nginx:
+    image: nginx:latest
+    container_name: nginx_reverse_proxy
+    ports:
+      - 80:80
+      - 431:431
+    volumes:
+      - ./nextcloud:/etc/nginx/conf.d/nextcloud.conf
+    network_mode: host
+    restart: unless-stopped

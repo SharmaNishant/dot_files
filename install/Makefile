@@ -71,6 +71,7 @@ setup_bash:
 	echo "source ~/vcs/dot_files/bash/customs" >> ~/.bashrc
 	echo "source ~/vcs/dot_files/bash/aliases" >> ~/.bashrc
 	echo "source ~/vcs/dot_files/bash/functions" >> ~/.bashrc
+	echo "DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker" >> ~/.bashrc
 	@echo "Setting up links to vimrc and tmux.conf"
 	ln -s ~/vcs/dot_files/nvim ~/.config/nvim
 	ln -s ~/vcs/dot_files/vim/.vimrc ~/.vimrc
@@ -193,3 +194,5 @@ setup_peek:
 #
 
 
+# docker pull nginx
+# docker pull nextcloud
