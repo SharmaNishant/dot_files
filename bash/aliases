@@ -69,6 +69,8 @@ alias evimrc="vim ~/.vimrc"
 alias envimrc="nvim ~/.config/nvim"
 alias etmuxconf="vim ~/.tmux.conf"
 
+alias sai="sudo apt install"
+
 # personal website on github uses jekyll. Related command
 alias website_test="cd ~/vcs/nishant_sharma && jekyll serve --host 0.0.0.0"
 
