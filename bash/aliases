@@ -58,6 +58,13 @@ alias gphf="git push --force-with-lease"
 alias gfp="git fetch --prune"
 alias grh="git reset --hard"
 
+# docker compose commands
+alias dcd="docker compose down"
+alias dcp="docker compose pull"
+alias dcb="docker compose build"
+alias dcu="docker compose up"
+alias dcud="docker compose up -d"
+
 # shorthand for editing and sourcing files
 alias vim="nvim"
 alias sbashrc="source ~/.bashrc"
