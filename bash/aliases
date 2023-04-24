@@ -64,6 +64,7 @@ alias dcp="docker compose pull"
 alias dcb="docker compose build"
 alias dcu="docker compose up"
 alias dcud="docker compose up -d"
+alias dcr="docker compose restart"
 
 # shorthand for editing and sourcing files
 alias vim="nvim"
