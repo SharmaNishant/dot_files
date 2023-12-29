@@ -59,13 +59,6 @@ media:
 tools:
 	sudo apt -y install htop meld tmux vim geany elinks
 
-#teamviewer:
-#	sudo apt -y install qml-module-qtquick-dialogs qml-module-qtquick-privatewidgets
-#	rm -f teamviewer_amd64.deb
-#	wget https://download.teamviewer.com/download/linux/teamviewer_amd64.deb
-#	sudo dpkg -i teamviewer_amd64.deb
-#	rm -f teamviewer_amd64.deb
-
 setup_bash:
 	{ echo "# Customizations to bash"; } >> ~/.bashrc
 	{ echo "source ~/vcs/dot_files/bash/customs"; } >> ~/.bashrc
@@ -76,6 +69,13 @@ setup_bash:
 	ln -s ~/vcs/dot_files/nvim ~/.config/nvim
 	ln -s ~/vcs/dot_files/vim/.vimrc ~/.vimrc
 	ln -s ~/vcs/dot_files/tmux/.tmux.conf ~/.tmux.conf
+
+setup_zsh:
+	{ echo "# Customizations to zsh"; } >> ~/.zshrc
+	{ echo "source ~/vcs/dot_files/bash/customs"; } >> ~/.zshrc
+	{ echo "source ~/vcs/dot_files/bash/aliases"; } >> ~/.zshrc
+	{ echo "source ~/vcs/dot_files/bash/functions"; } >> ~/.zshrc
+
 
 .ONESHELL:
 setup_vim:
