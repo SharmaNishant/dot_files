@@ -195,6 +195,16 @@ convert_to_mp4 ()
     ffmpeg -i "$1" -vcodec libx264 -crf 20 -acodec copy "$2"
 }
 
+################################################################################
+#                          PDF Utilities                                       #
+################################################################################
+
+# input file pattern and output file name
+make_pdf_current_folder ()
+{
+    for b in `ls -1 $1`; do  echo $b; convert "$b" "$b".pdf; done
+    pdftk $1.pdf cat output "$2"
+}
 
 ################################################################################
 #                          SCREEN RECORD UTILITIES                             #
@@ -247,3 +257,13 @@ download_channel_mp3() {
     youtube-dl -f "bestaudio/best" -ciw -o "%(title)s.%(ext)s" -v --extract-audio --audio-quality 0 --audio-format mp3 "${1}"
 }
 
+################################################################################
+#                         DOCKER                                               #
+################################################################################
+
+plex_update() {
+    dcd
+    dcp
+    dcb
+    dcud
+}
