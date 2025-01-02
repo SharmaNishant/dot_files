@@ -1,5 +1,5 @@
-backup_nextcloud () {
-    sudo nextcloud.export -abcd
+backup_nextcloud_on_sheru () {
+    sudo rsync -rlthvP --info=progress2  --delete-after --exclude '*appdata_ocx404u2sj5p/preview*' /home/ubuntu/nextcloud/ /home/ubuntu/backups/nextcloud/
 }
 
 backup_external_nextcloud () {
