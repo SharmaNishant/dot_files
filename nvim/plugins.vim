@@ -21,7 +21,7 @@ Plug 'blueshirts/darcula'
 Plug 'terryma/vim-multiple-cursors'
 
 
-Plug 'rhysd/vim-clang-format'
+" Plug 'rhysd/vim-clang-format'
 " Plug 'taketwo/vim-ros'
 
 Plug 'vim-airline/vim-airline'
@@ -31,9 +31,9 @@ Plug 'vim-airline/vim-airline'
 "Plug 'edkolev/tmuxline.vim'
 
 " " Autocompletion
-Plug 'w0rp/ale'
-" " Plug 'zxqfl/tabnine-vim'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Plug 'w0rp/ale'
+" Plug 'zxqfl/tabnine-vim'
+" Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " Plug 'neoclide/coc-tsserver', {'do': 'yarn install --frozen-lockfile'}
 " Plug 'neoclide/coc-rls', {'do': 'yarn install --frozen-lockfile'}
 " Plug 'neoclide/coc-snippets', {'do': 'yarn install --frozen-lockfile'}

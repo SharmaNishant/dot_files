@@ -221,6 +221,16 @@ convert_to_mp4 ()
     ffmpeg -i "$1" -vcodec libx264 -crf 20 -acodec copy "$2"
 }
 
+################################################################################
+#                          PDF Utilities                                       #
+################################################################################
+
+# input file pattern and output file name
+make_pdf_current_folder ()
+{
+    for b in `ls -1 $1`; do  echo $b; convert "$b" "$b".pdf; done
+    pdftk $1.pdf cat output "$2"
+}
 
 ################################################################################
 #                          SCREEN RECORD UTILITIES                             #
@@ -272,4 +282,46 @@ record_mp4 ()
 download_channel_mp3() {
     youtube-dl -f "bestaudio/best" -ciw -o "%(title)s.%(ext)s" -v --extract-audio --audio-quality 0 --audio-format mp3 "${1}"
 }
+
+################################################################################
+#                         DOCKER                                               #
+################################################################################
+
+plex_update() {
+    dcd
+    dcp
+    dcb
+    dcud
+}
+
+################################################################################
+#                         BACKUPS                                              #
+################################################################################
+
+backup_nextcloud_on_sheru () {
+    sudo rsync -rlthvP --info=progress2 --no-inc-recursive --delete-after --exclude '*appdata_ocx404u2sj5p/preview*' /home/ubuntu/nextcloud/ /home/ubuntu/backups/nextcloud/
+}
+
+backup_nextcloud_from_sheru () {
+    if [ -z "$1" ]
+        then
+            echo "Please pass a directory where the backup should be done"
+        else
+            rsync -e 'ssh' -rlthvP --info=progress2  --no-inc-recursive --delete-after sheru:/home/ubuntu/backups/nextcloud/ "$1"
+    fi
+}
+
+backup_plex_on_home () {
+    rsync -avh --info=progress2 --no-inc-recursive --delete-after ~/plex/ /media/data/plex/
+}
+
+backup_plex_from_sheru () {
+    if [ -z "$1" ]
+    then
+        echo "Please pass a directory where the backup should be done"
+    else
+        rsync -e 'ssh' -ahv --info=progress2 --no-inc-recursive --delete-after sheru:plex/ "$1"
+    fi
+}
+
 

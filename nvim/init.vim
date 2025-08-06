@@ -15,6 +15,6 @@ source ~/.config/nvim/plugins.vim
 source ~/.config/nvim/general.vim
 source ~/.config/nvim/keybindings.vim
 source ~/.config/nvim/plugin_configs.vim
-source ~/.config/nvim/coc.vim
-source ~/.config/nvim/ale.vim
+" source ~/.config/nvim/coc.vim
+" source ~/.config/nvim/ale.vim
 

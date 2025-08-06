@@ -107,29 +107,35 @@ export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;36m'
 
 ######### ONE TIME GIT SETTINGS ###############
-#
-# git config --global core.editor nvim
-#
-# git config --global diff.tool meld
-# git config --global difftool.prompt false
-# git config --global difftool.meld trustExitCode true
-#
-# git config --global merge.tool meld
-# git config --global mergetool.prompt false
-# git config --global mergetool.meld trustExitCode true
-#
-# git config --global user.name "Nishant Sharma"
-# git config --global user.email <email>
-#
-# git config --global mergetool.keepBackup false
-# git config --global pull.ff only
-
-#
-# [difftool "nvimdiff"]
-#     cmd = "nvim -d -u ~/.vimrc \"$LOCAL\" \"$REMOTE\""
-# [mergetool "nvimdiff"]
-#   cmd = nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
-#
-#
 
 
+function setup_git_config() {
+
+git config --global core.editor nvim
+
+git config --global diff.tool meld
+git config --global difftool.prompt false
+git config --global difftool.meld trustExitCode true
+
+git config --global merge.tool meld
+git config --global mergetool.prompt false
+git config --global mergetool.meld trustExitCode true
+
+git config --global user.name "Nishant Sharma"
+
+git config --global mergetool.keepBackup false
+git config --global pull.ff only
+
+git config --global difftool.nvimdiff.cmd 'nvim -d -u ~/.vimrc "$LOCAL" "$REMOTE"'
+git config --global mergetool.nvimdiff.cmd "nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'"
+
+git config --global branch.sort -committerdate
+
+git config --global core.fsmonitor true
+
+git config --global alias.fpush push --force-with-lease
+
+echo "please config which email you want next"
+echo "git config --global user.email "
+
+}
