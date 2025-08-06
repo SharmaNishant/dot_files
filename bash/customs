@@ -1,74 +1,91 @@
 #!/bin/bash
-# customizations to bash. Also used to setup aliases and functions
+# Shell customizations for both bash and zsh. Setup aliases, functions, and prompts
 #
 # Author: Nishant Sharma <'nishants1994' at gmail>
 
-# history updates
-export HISTCONTROL=erasedups
-export HISTSIZE=99999
-shopt -s histappend
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+    echo "This script should be sourced, not executed directly"
+    exit 1
+fi
 
+# Common configuration
+export HISTSIZE=99999
 export EDITOR="nvim"
 
-export TIMEFORMAT='r: %R, u: %U, s: %S'
 
-# run and time the current typed command
-bind '"\C-j": "\C-atime \C-m"'
 
-parse_git_branch () {
-    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
-}
-
-get_time () {
-     date | awk '{print $4}' | cut -c 1-5
-}
+# Detect shell and configure shell-specific settings
+if [ -n "$ZSH_VERSION" ]; then
+    # ZSH configuration
+    # History settings
+    export SAVEHIST=99999
+    setopt HIST_IGNORE_ALL_DUPS
+    setopt APPEND_HISTORY
+    setopt SHARE_HISTORY
+    
+    # Key binding to run and time current command (Ctrl+J)
+    time_command() {
+        BUFFER="time $BUFFER"
+        zle accept-line
+    }
+    zle -N time_command
+    bindkey '^J' time_command
+    
+    # Prompt configuration
+    autoload -Uz vcs_info
+    precmd() { vcs_info }
+    zstyle ':vcs_info:git:*' formats ' (%b)'
+    setopt PROMPT_SUBST
+    export PS1='%F{cyan}%~%f%F{yellow}${vcs_info_msg_0_}%f %F{green}➜%f '
+    export RPS1='%F{magenta}[%D{%H:%M:%S}]%f'
+    
+elif [ -n "$BASH_VERSION" ]; then
+    # BASH configuration
+    # History settings
+    export HISTCONTROL=erasedups
+    export HISTFILESIZE=99999
+    shopt -s histappend
+    
+    # Time format for 'time' command output
+    export TIMEFORMAT='r: %R, u: %U, s: %S'
+    
+    # Key binding to run and time current command (Ctrl+J)
+    bind '"\C-j": "\C-atime \C-m"'
+    
+    # Prompt configuration
+    git_branch() {
+        git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+    }
+    
+    get_time() {
+        date +"%H:%M:%S"
+    }
+    
+    export PS1='\[\033[36m\]\w\[\033[33m\]$(git_branch)\[\033[32m\] ➜\[\033[0m\] '
+    export PROMPT_COMMAND='echo -ne "\033]0;$(get_time)\007"'
+    
+else
+    echo "Unsupported shell"
+fi
 
 print_horizontal_line () {
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 }
 
-#export PS1="\$(print_horizontal_line) > \$(get_time) \[\033[32m\]\w\[\033[33m\]\$(parse_git_branch)\[\033[00m\] $ "
-
-
-RESET="\[\033[0m\]"
-RED="\[\033[0;31m\]"
-GREEN="\[\033[01;32m\]"
-BLUE="\[\033[01;34m\]"
-YELLOW="\[\033[0;33m\]"
-
-function parse_git_branch_simple {
-  export PS_BRANCH
-  PS_BRANCH=''
-  PS_FILL=${PS_LINE:0:$COLUMNS}
-  if [ -d .svn ]; then
-    PS_BRANCH="(svn r$(svn info|awk '/Revision/{print $2}'))"
-    return
-  elif [ -f _FOSSIL_ ] || [ -f .fslckout ]; then
-    PS_BRANCH="(fossil $(fossil status|awk '/tags/{print $2}')) "
-    return
-  fi
-  BRANCH=$(git branch 2> /dev/null) || return
-  PS_BRANCH="(git $(echo "$BRANCH" | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')) "
-}
-
-PROMPT_COMMAND=parse_git_branch_simple
-PS_LINE="$(printf -- '-%.0s' {1..400})"
-PS_FILL=${PS_LINE:0:$COLUMNS}
-PS_INFO="${GREEN}${RESET}${BLUE}\w"
-PS_GIT="$YELLOW\$PS_BRANCH"
-PS_TIME="\[\033[\$((COLUMNS-10))G\] $RED[\t]"
-#export PS1="\${PS_FILL}\[\033[0G\]${PS_INFO} ${PS_TIME}\n${RESET}\$ "
-export PS1="\${PS_FILL}\[\033[0G\]${PS_INFO} ${PS_GIT}${PS_TIME}\n${RESET}\$ "
-
 
 # enable colors
-if whence dircolors >/dev/null; then
+if command -v dircolors >/dev/null 2>&1; then
   eval "$(dircolors -b)"
-  zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
-  alias ls='ls --color'
+  # ZSH-specific completion colors
+  if [ -n "$ZSH_VERSION" ]; then
+    zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+  fi
 else
   export CLICOLOR=1
-  zstyle ':completion:*:default' list-colors ''
+  # ZSH-specific completion colors
+  if [ -n "$ZSH_VERSION" ]; then
+    zstyle ':completion:*:default' list-colors ''
+  fi
 fi
 
 # force ls to always use color and type indicators
