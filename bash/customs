@@ -23,14 +23,6 @@ if [ -n "$ZSH_VERSION" ]; then
     setopt APPEND_HISTORY
     setopt SHARE_HISTORY
     
-    # Key binding to run and time current command (Ctrl+J)
-    time_command() {
-        BUFFER="time $BUFFER"
-        zle accept-line
-    }
-    zle -N time_command
-    bindkey '^J' time_command
-    
     # Prompt configuration
     autoload -Uz vcs_info
     precmd() { vcs_info }
@@ -45,12 +37,6 @@ elif [ -n "$BASH_VERSION" ]; then
     export HISTCONTROL=erasedups
     export HISTFILESIZE=99999
     shopt -s histappend
-    
-    # Time format for 'time' command output
-    export TIMEFORMAT='r: %R, u: %U, s: %S'
-    
-    # Key binding to run and time current command (Ctrl+J)
-    bind '"\C-j": "\C-atime \C-m"'
     
     # Prompt configuration
     git_branch() {
