@@ -18,38 +18,33 @@ export EDITOR="nvim"
 if [ -n "$ZSH_VERSION" ]; then
     # ZSH configuration
     # History settings
-    export SAVEHIST=99999
+    export SAVEHIST=999999
     setopt HIST_IGNORE_ALL_DUPS
     setopt APPEND_HISTORY
     setopt SHARE_HISTORY
-    
+
     # Prompt configuration
     autoload -Uz vcs_info
-    precmd() { vcs_info }
+    precmd() { vcs_info; }
     zstyle ':vcs_info:git:*' formats ' (%b)'
     setopt PROMPT_SUBST
     export PS1='%F{cyan}%~%f%F{yellow}${vcs_info_msg_0_}%f %F{green}➜%f '
     export RPS1='%F{magenta}[%D{%H:%M:%S}]%f'
-    
+
 elif [ -n "$BASH_VERSION" ]; then
     # BASH configuration
     # History settings
     export HISTCONTROL=erasedups
-    export HISTFILESIZE=99999
+    export HISTFILESIZE=999999
     shopt -s histappend
-    
+
     # Prompt configuration
     git_branch() {
         git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
     }
-    
-    get_time() {
-        date +"%H:%M:%S"
-    }
-    
+
     export PS1='\[\033[36m\]\w\[\033[33m\]$(git_branch)\[\033[32m\] ➜\[\033[0m\] '
-    export PROMPT_COMMAND='echo -ne "\033]0;$(get_time)\007"'
-    
+
 else
     echo "Unsupported shell"
 fi
