@@ -1,68 +1,100 @@
 #!/bin/bash
-# customizations to bash. Also used to setup aliases and functions
+# Shell customizations for both bash and zsh. Setup aliases, functions, and prompts
 #
 # Author: Nishant Sharma <'nishants1994' at gmail>
 
-# history updates
-export HISTCONTROL=erasedups
-export HISTSIZE=99999
-shopt -s histappend
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+    echo "This script should be sourced, not executed directly"
+    exit 1
+fi
 
+# Common configuration
+export HISTSIZE=99999
 export EDITOR="nvim"
 
-export TIMEFORMAT='r: %R, u: %U, s: %S'
 
-# run and time the current typed command
-bind '"\C-j": "\C-atime \C-m"'
 
-parse_git_branch () {
-    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
-}
+# Detect shell and configure shell-specific settings
+if [ -n "$ZSH_VERSION" ]; then
+    # ZSH configuration
+    # History settings
+    export SAVEHIST=999999
+    setopt HIST_IGNORE_ALL_DUPS
+    setopt APPEND_HISTORY
+    setopt SHARE_HISTORY
 
-get_time () {
-     date | awk '{print $4}' | cut -c 1-5
-}
+    # Prompt configuration
+    autoload -Uz vcs_info
+    precmd() { vcs_info; }
+    zstyle ':vcs_info:git:*' formats ' (%b)'
+    setopt PROMPT_SUBST
+    export PS1='%F{cyan}%~%f%F{yellow}${vcs_info_msg_0_}%f %F{green}➜%f '
+    export RPS1='%F{magenta}[%D{%H:%M:%S}]%f'
+
+elif [ -n "$BASH_VERSION" ]; then
+    # BASH configuration
+    # History settings
+    export HISTCONTROL=erasedups
+    export HISTFILESIZE=999999
+    shopt -s histappend
+    shopt -s checkwinsize
+
+    # Prompt configuration
+    git_branch() {
+        git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+    }
+
+    # Right prompt: time
+    __bash_rprompt() {
+        local cols=${COLUMNS:-$(tput cols)}
+        local rt="[$(date +%H:%M:%S)]"
+        local len=${#rt}
+        local col=$(( cols - len + 1 ))
+        (( col < 1 )) && col=1
+        printf '\e7'              # save cursor
+        printf '\e[%dG' "$col"    # move to column
+        printf '\e[35m%s\e[0m' "$rt"
+        printf '\e8'              # restore cursor
+    }
+
+    # Title (optional)
+    __bash_title() {
+        printf '\033]0;%s\007' "$(pwd)"
+    }
+
+    # Left prompt
+    export PS1='\[\033[36m\]\w\[\033[33m\]$(git_branch)\[\033[32m\] ➜\[\033[0m\] '
+
+    # Compose PROMPT_COMMAND safely
+    if [ -n "$PROMPT_COMMAND" ]; then
+        PROMPT_COMMAND="__bash_rprompt; __bash_title; $PROMPT_COMMAND"
+    else
+        PROMPT_COMMAND="__bash_rprompt; __bash_title"
+    fi
+
+else
+    echo "Unsupported shell"
+fi
 
 print_horizontal_line () {
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 }
 
-#export PS1="\$(print_horizontal_line) > \$(get_time) \[\033[32m\]\w\[\033[33m\]\$(parse_git_branch)\[\033[00m\] $ "
-
-
-RESET="\[\033[0m\]"
-RED="\[\033[0;31m\]"
-GREEN="\[\033[01;32m\]"
-BLUE="\[\033[01;34m\]"
-YELLOW="\[\033[0;33m\]"
-
-function parse_git_branch_simple {
-  export PS_BRANCH
-  PS_BRANCH=''
-  PS_FILL=${PS_LINE:0:$COLUMNS}
-  if [ -d .svn ]; then
-    PS_BRANCH="(svn r$(svn info|awk '/Revision/{print $2}'))"
-    return
-  elif [ -f _FOSSIL_ ] || [ -f .fslckout ]; then
-    PS_BRANCH="(fossil $(fossil status|awk '/tags/{print $2}')) "
-    return
-  fi
-  BRANCH=$(git branch 2> /dev/null) || return
-  PS_BRANCH="(git $(echo "$BRANCH" | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')) "
-}
-
-PROMPT_COMMAND=parse_git_branch_simple
-PS_LINE="$(printf -- '-%.0s' {1..400})"
-PS_FILL=${PS_LINE:0:$COLUMNS}
-PS_INFO="${GREEN}${RESET}${BLUE}\w"
-PS_GIT="$YELLOW\$PS_BRANCH"
-PS_TIME="\[\033[\$((COLUMNS-10))G\] $RED[\t]"
-#export PS1="\${PS_FILL}\[\033[0G\]${PS_INFO} ${PS_TIME}\n${RESET}\$ "
-export PS1="\${PS_FILL}\[\033[0G\]${PS_INFO} ${PS_GIT}${PS_TIME}\n${RESET}\$ "
-
 
 # enable colors
-eval "$(dircolors -b)"
+if command -v dircolors >/dev/null 2>&1; then
+  eval "$(dircolors -b)"
+  # ZSH-specific completion colors
+  if [ -n "$ZSH_VERSION" ]; then
+    zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+  fi
+else
+  export CLICOLOR=1
+  # ZSH-specific completion colors
+  if [ -n "$ZSH_VERSION" ]; then
+    zstyle ':completion:*:default' list-colors ''
+  fi
+fi
 
 # force ls to always use color and type indicators
 alias ls='ls -hF --color=auto'
@@ -83,29 +115,35 @@ export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;36m'
 
 ######### ONE TIME GIT SETTINGS ###############
-#
-# git config --global core.editor nvim
-#
-# git config --global diff.tool meld
-# git config --global difftool.prompt false
-# git config --global difftool.meld trustExitCode true
-#
-# git config --global merge.tool meld
-# git config --global mergetool.prompt false
-# git config --global mergetool.meld trustExitCode true
-#
-# git config --global user.name "Nishant Sharma"
-# git config --global user.email <email>
-#
-# git config --global mergetool.keepBackup false
-# git config --global pull.ff only
-
-#
-# [difftool "nvimdiff"]
-#     cmd = "nvim -d -u ~/.vimrc \"$LOCAL\" \"$REMOTE\""
-# [mergetool "nvimdiff"]
-#   cmd = nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
-#
-#
 
 
+function setup_git_config() {
+
+git config --global core.editor nvim
+
+git config --global diff.tool meld
+git config --global difftool.prompt false
+git config --global difftool.meld trustExitCode true
+
+git config --global merge.tool meld
+git config --global mergetool.prompt false
+git config --global mergetool.meld trustExitCode true
+
+git config --global user.name "Nishant Sharma"
+
+git config --global mergetool.keepBackup false
+git config --global pull.ff only
+
+git config --global difftool.nvimdiff.cmd 'nvim -d -u ~/.vimrc "$LOCAL" "$REMOTE"'
+git config --global mergetool.nvimdiff.cmd "nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'"
+
+git config --global branch.sort -committerdate
+
+git config --global core.fsmonitor true
+
+git config --global alias.fpush push --force-with-lease
+
+echo "please config which email you want next"
+echo "git config --global user.email "
+
+}

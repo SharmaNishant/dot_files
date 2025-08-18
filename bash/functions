@@ -1,7 +1,12 @@
 #!/bin/bash
-# this file contains black magic
+# Shell functions and key bindings for both bash and zsh
 #
 # Author: Nishant Sharma <'nishants1994' at gmail>
+
+if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+    echo "This script should be sourced, not executed directly"
+    exit 1
+fi
 
 
 ################################################################################
@@ -39,7 +44,14 @@ ctrl_p () {
     local file_name
     file_name=$(fzf) && echo "vim ${file_name}" | writecmd
 }
-bind -x '"\C-p": ctrl_p;'
+
+# Key binding setup for Ctrl+P
+if [ -n "$ZSH_VERSION" ]; then
+    zle -N ctrl_p
+    bindkey '^P' ctrl_p
+elif [ -n "$BASH_VERSION" ]; then
+    bind -x '"\C-p": ctrl_p;'
+fi
 
 
 kill_ros () {
@@ -100,7 +112,14 @@ fbr () {
            fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
   git checkout "$(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")"
 }
-bind -x '"\eb": fbr;'
+
+# Key binding setup for Alt+B
+if [ -n "$ZSH_VERSION" ]; then
+    zle -N fbr
+    bindkey '\eb' fbr
+elif [ -n "$BASH_VERSION" ]; then
+    bind -x '"\eb": fbr;'
+fi
 
 fetch_local_branch () {
   local branches branch
@@ -109,7 +128,14 @@ fetch_local_branch () {
            fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
   git checkout "$(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")"
 }
-bind -x '"\es": fetch_local_branch;'
+
+# Key binding setup for Alt+S
+if [ -n "$ZSH_VERSION" ]; then
+    zle -N fetch_local_branch
+    bindkey '\es' fetch_local_branch
+elif [ -n "$BASH_VERSION" ]; then
+    bind -x '"\es": fetch_local_branch;'
+fi
 
 gbd () {
   local branches branch
